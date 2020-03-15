@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков\Plugin">
+      <UniqueIdentifier>{81153d3c-acb4-4eb0-b1fa-b0ea35a702f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Plugin">
+      <UniqueIdentifier>{01d268a7-33ab-440d-a052-0210ca05afd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Configurator">
+      <UniqueIdentifier>{96785dc4-8456-47ea-9e1d-193358f55a85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Configurator">
+      <UniqueIdentifier>{f73051ca-283c-44b1-8856-8b73d410ab19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\SettingsDataStore">
+      <UniqueIdentifier>{d2763330-29ff-45dd-b051-641bac2c2207}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\SettingsDataStore">
+      <UniqueIdentifier>{a54c541e-6f97-4324-ab27-8d2d8ef6bd90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\PIService">
+      <UniqueIdentifier>{a2730e3f-7778-4f93-8efa-8e816741b79e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\PIService">
+      <UniqueIdentifier>{529f7ef0-03db-4891-9066-a5bc18aff52f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Browser">
+      <UniqueIdentifier>{2e1053f1-cf4d-4e13-a63b-18bec2cbf754}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Browser">
+      <UniqueIdentifier>{63bc5886-13a1-41d6-ab55-2a7a442e0258}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Server">
+      <UniqueIdentifier>{347caf3e-8386-4bdd-962c-e3948e26d323}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Server">
+      <UniqueIdentifier>{ba132c26-3957-4619-a5c7-f8dd16274d4d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertySet.cpp">
+      <Filter>Исходные файлы\Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisterInfo.cpp">
+      <Filter>Исходные файлы\Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="PluginObjectFactory.cpp">
+      <Filter>Исходные файлы\Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="Export.cpp">
+      <Filter>Исходные файлы\Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionAttributes.cpp">
+      <Filter>Исходные файлы\Configurator</Filter>
+    </ClCompile>
+    <ClCompile Include="XMLSettingsDataSource.cpp">
+      <Filter>Исходные файлы\SettingsDataStore</Filter>
+    </ClCompile>
+    <ClCompile Include="pugixml\pugixml.cpp">
+      <Filter>Исходные файлы\SettingsDataStore</Filter>
+    </ClCompile>
+    <ClCompile Include="TagInfo.cpp">
+      <Filter>Исходные файлы\PIService</Filter>
+    </ClCompile>
+    <ClCompile Include="PIApplication.cpp">
+      <Filter>Исходные файлы\PIService</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientSettingsDialog.cpp">
+      <Filter>Исходные файлы\Configurator</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowseNetworkServers.cpp">
+      <Filter>Исходные файлы\Configurator</Filter>
+    </ClCompile>
+    <ClCompile Include="DConfigurator.cpp">
+      <Filter>Исходные файлы\Configurator</Filter>
+    </ClCompile>
+    <ClCompile Include="HdaBrowserHandler.cpp">
+      <Filter>Исходные файлы\Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="Log.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserHdaItem.cpp">
+      <Filter>Исходные файлы\Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="ParamUtils.cpp">
+      <Filter>Исходные файлы\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="ParamValue.cpp">
+      <Filter>Исходные файлы\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="ParamValueList.cpp">
+      <Filter>Исходные файлы\Server</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Drv_OSIPI_Archive_HdaItem.def">
+      <Filter>Исходные файлы</Filter>
+    </None>
+    <None Include="res\Drv_OSIPI_Archive_HdaItem.rc2">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Export.h">
+      <Filter>Файлы заголовков\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertySet.h">
+      <Filter>Файлы заголовков\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="RegisterInfo.h">
+      <Filter>Файлы заголовков\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginObjectFactory.h">
+      <Filter>Файлы заголовков\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionAttributes.h">
+      <Filter>Файлы заголовков\Configurator</Filter>
+    </ClInclude>
+    <ClInclude Include="ISettingsDataSource.h">
+      <Filter>Файлы заголовков\SettingsDataStore</Filter>
+    </ClInclude>
+    <ClInclude Include="XMLSettingsDataSource.h">
+      <Filter>Файлы заголовков\SettingsDataStore</Filter>
+    </ClInclude>
+    <ClInclude Include="IServerInteractor.h">
+      <Filter>Файлы заголовков\PIService</Filter>
+    </ClInclude>
+    <ClInclude Include="IServerInteractorOutput.h">
+      <Filter>Файлы заголовков\PIService</Filter>
+    </ClInclude>
+    <ClInclude Include="TagInfo.h">
+      <Filter>Файлы заголовков\PIService</Filter>
+    </ClInclude>
+    <ClInclude Include="PIApplication.h">
+      <Filter>Файлы заголовков\PIService</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientSettingsDialog.h">
+      <Filter>Файлы заголовков\Configurator</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowseNetworkServers.h">
+      <Filter>Файлы заголовков\Configurator</Filter>
+    </ClInclude>
+    <ClInclude Include="DConfigurator.h">
+      <Filter>Файлы заголовков\Configurator</Filter>
+    </ClInclude>
+    <ClInclude Include="HdaBrowserHandler.h">
+      <Filter>Файлы заголовков\Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="Log.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserHdaItem.h">
+      <Filter>Файлы заголовков\Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="ParamUtils.h">
+      <Filter>Файлы заголовков\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="ParamValue.h">
+      <Filter>Файлы заголовков\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="ParamValueList.h">
+      <Filter>Файлы заголовков\Server</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Drv_OSIPI_Archive_HdaItem.rc">
+      <Filter>Файлы ресурсов</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\filetypes.bmp">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
