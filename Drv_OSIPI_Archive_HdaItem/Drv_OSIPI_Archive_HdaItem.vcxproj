@@ -214,6 +214,7 @@
     <ClCompile Include="PluginObjectFactory.cpp" />
     <ClCompile Include="PropertySet.cpp" />
     <ClCompile Include="pugixml\pugixml.cpp" />
+    <ClCompile Include="Record.cpp" />
     <ClCompile Include="RegisterInfo.cpp" />
     <ClCompile Include="TagInfo.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="PIApplication.h" />
     <ClInclude Include="PluginObjectFactory.h" />
     <ClInclude Include="PropertySet.h" />
+    <ClInclude Include="Record.h" />
     <ClInclude Include="RegisterInfo.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="TagInfo.h" />

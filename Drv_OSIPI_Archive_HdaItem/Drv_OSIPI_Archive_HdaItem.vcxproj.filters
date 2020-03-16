@@ -111,6 +111,9 @@
     <ClCompile Include="ParamValueList.cpp">
       <Filter>Исходные файлы\Server</Filter>
     </ClCompile>
+    <ClCompile Include="Record.cpp">
+      <Filter>Исходные файлы\PIService</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Drv_OSIPI_Archive_HdaItem.def">
@@ -198,6 +201,9 @@
     </ClInclude>
     <ClInclude Include="ParamValueList.h">
       <Filter>Файлы заголовков\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="Record.h">
+      <Filter>Файлы заголовков\PIService</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
