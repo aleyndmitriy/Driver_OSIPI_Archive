@@ -6,6 +6,7 @@
 #include<set>
 #include<map>
 #include<Windows.h>
+#include"Record.h"
 
 namespace DrvOSIPIArchValues
 {
@@ -23,7 +24,7 @@ namespace DrvOSIPIArchValues
 		virtual void OpenConnection() = 0;
 		virtual void TestConnection() = 0;
 		virtual void GetTags(std::set<TagInfo>& tags, std::vector<std::string>& tagsPath, const std::string& connectionID) = 0;
-		virtual void GetRecords(std::map<std::string, std::vector<std::string> >& tagsData, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime,
+		virtual void GetRecords(std::map<std::string, std::vector<Record> >& tagsData, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime,
 			const std::map<std::string, std::vector<std::string> >& fullPaths, const std::string& connectionID) = 0;
 	};
 }

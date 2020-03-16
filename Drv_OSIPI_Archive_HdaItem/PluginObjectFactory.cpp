@@ -21,7 +21,7 @@ int DrvOSIPIArchValues::PluginObjectFactory::CreateObject(const TCHAR* szObjKey,
 	if (_tcscmp(szObjKey, OSI_PI_HIST_VALUES)) {
 		return ODS::ERR::BAD_PARAM;
 	}
-	//*ppPluginObj = new CDSource(DataAccessAssembly::Instance().GetSettingDataSource(), DataAccessAssembly::Instance().GetSoftingDataSource());
+	//*ppPluginObj = new CDSource(std::make_shared<XMLSettingsDataSource>(), std::make_shared<PIServerInteractor>());
 	if (*ppPluginObj)
 		return ODS::ERR::OK;
 	else

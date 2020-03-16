@@ -114,6 +114,15 @@
     <ClCompile Include="Record.cpp">
       <Filter>Исходные файлы\PIService</Filter>
     </ClCompile>
+    <ClCompile Include="HdaCommandHandler.cpp">
+      <Filter>Исходные файлы\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerHdaItem.cpp">
+      <Filter>Исходные файлы\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="DSource.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Drv_OSIPI_Archive_HdaItem.def">
@@ -204,6 +213,15 @@
     </ClInclude>
     <ClInclude Include="Record.h">
       <Filter>Файлы заголовков\PIService</Filter>
+    </ClInclude>
+    <ClInclude Include="HdaCommandHandler.h">
+      <Filter>Файлы заголовков\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerHdaItem.h">
+      <Filter>Файлы заголовков\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="DSource.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

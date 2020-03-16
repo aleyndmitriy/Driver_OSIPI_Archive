@@ -198,8 +198,10 @@
     <ClCompile Include="ClientSettingsDialog.cpp" />
     <ClCompile Include="ConnectionAttributes.cpp" />
     <ClCompile Include="DConfigurator.cpp" />
+    <ClCompile Include="DSource.cpp" />
     <ClCompile Include="Export.cpp" />
     <ClCompile Include="HdaBrowserHandler.cpp" />
+    <ClCompile Include="HdaCommandHandler.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="ParamUtils.cpp" />
     <ClCompile Include="ParamValue.cpp" />
@@ -216,6 +218,7 @@
     <ClCompile Include="pugixml\pugixml.cpp" />
     <ClCompile Include="Record.cpp" />
     <ClCompile Include="RegisterInfo.cpp" />
+    <ClCompile Include="ServerHdaItem.cpp" />
     <ClCompile Include="TagInfo.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="XMLSettingsDataSource.cpp" />
@@ -231,9 +234,11 @@
     <ClInclude Include="ConnectionAttributes.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="DConfigurator.h" />
+    <ClInclude Include="DSource.h" />
     <ClInclude Include="Export.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="HdaBrowserHandler.h" />
+    <ClInclude Include="HdaCommandHandler.h" />
     <ClInclude Include="IServerInteractor.h" />
     <ClInclude Include="IServerInteractorOutput.h" />
     <ClInclude Include="ISettingsDataSource.h" />
@@ -248,6 +253,7 @@
     <ClInclude Include="Record.h" />
     <ClInclude Include="RegisterInfo.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="ServerHdaItem.h" />
     <ClInclude Include="TagInfo.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Utils.h" />
