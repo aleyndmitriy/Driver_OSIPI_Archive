@@ -87,9 +87,6 @@
     <ClCompile Include="Utils.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="BrowseNetworkServers.cpp">
-      <Filter>Исходные файлы\Configurator</Filter>
-    </ClCompile>
     <ClCompile Include="DConfigurator.cpp">
       <Filter>Исходные файлы\Configurator</Filter>
     </ClCompile>
@@ -122,6 +119,9 @@
     </ClCompile>
     <ClCompile Include="DSource.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="PIServerInteractor.cpp">
+      <Filter>Исходные файлы\PIService</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -187,9 +187,6 @@
     <ClInclude Include="Utils.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="BrowseNetworkServers.h">
-      <Filter>Файлы заголовков\Configurator</Filter>
-    </ClInclude>
     <ClInclude Include="DConfigurator.h">
       <Filter>Файлы заголовков\Configurator</Filter>
     </ClInclude>
@@ -222,6 +219,9 @@
     </ClInclude>
     <ClInclude Include="DSource.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="PIServerInteractor.h">
+      <Filter>Файлы заголовков\PIService</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

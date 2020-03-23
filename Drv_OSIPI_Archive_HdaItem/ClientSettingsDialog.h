@@ -27,11 +27,8 @@ private:
 	std::shared_ptr<DrvOSIPIArchValues::ConnectionAttributes> m_connectAttributes;
 	std::shared_ptr<DrvOSIPIArchValues::DataTypeAttributes> m_dataAttributes;
 	std::shared_ptr<DrvOSIPIArchValues::IServerInteractor> m_pInteractor;
-	std::vector<std::pair<std::string, int> > m_aggregates;
-	CEdit m_editComputerName;
 	CComboBox m_cmbServerName;
 	CEdit m_editPort;
-	CComboBox m_cmbConfiguration;
 	CEdit m_editLogin;
 	CEdit m_editUserPassword;
 	CComboBox m_cmbAggregateType;
@@ -48,30 +45,24 @@ private:
 	void WarningMessage(std::string message);
 	void ErrorMessage(std::string message);
 	void ShowDataReadTypeView(BOOL bShow);
-	void ClearAggregateListView();
-
+	void fillAggregateList();
 public:
-	afx_msg void OnEnChangeEditComputerName();
 	afx_msg void OnCbnSelchangeComboSelectServer();
 	afx_msg void OnCbnEditChangeComboSelectServer();
-	afx_msg void OnBtnClickedServerPropertyButton();
 	afx_msg void OnEnChangeEditPort();
 	afx_msg void OnBtnClickedButtonBrowseNetwork();
 	afx_msg void OnBtnClickedButtonDiscoverServers();
-	afx_msg void OnCbnSelChangeComboConfiguration();
 	afx_msg void OnBtnClickedButtonTestConnection();
 	afx_msg void OnBtnClickedCancel();
 	afx_msg void OnBtnClickedOk();
-	afx_msg void OnCbnDropDownComboAggregate();
 	afx_msg void OnDeltaPosSpinInterval(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnCbnSelChangeComboReadType();
 	afx_msg void OnEnUpdateEditDataQuality();
 	void SendMessageError(std::string&& message) override;
 	void SendWarning(std::string&& message) override;
 	void SendMessageInfo(std::string&& message) override;
-	void GetServers(std::vector<std::string>&& servers) override;
+	void GetServers(std::vector<std::pair<std::string, long>>&& servers) override;
 	void SelectFoundedServer(const std::string& compName, unsigned int port, const std::string& serverName) override;
-	void GetAggregates(std::vector<std::pair<std::string, int> >&& aggregates) override;
 	void GetNewConnectionGuide(std::string&& uuid) override;
 	void CloseConnectionWithGuide(std::string&& uuid) override;
 };

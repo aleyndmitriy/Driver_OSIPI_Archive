@@ -95,17 +95,10 @@ void DrvOSIPIArchValues::BrowserHandler::SendMessageInfo(std::string&& message)
 	Log::GetInstance()->WriteInfo(_T(message.c_str()));
 }
 
-void DrvOSIPIArchValues::BrowserHandler::GetServers(std::vector<std::string>&& servers)
+void DrvOSIPIArchValues::BrowserHandler::GetServers(std::vector<std::pair<std::string, long> >&& servers)
 {
 
 }
-
-
-void DrvOSIPIArchValues::BrowserHandler::GetAggregates(std::vector<std::pair<std::string, int> >&& aggregates)
-{
-
-}
-
 
 void DrvOSIPIArchValues::BrowserHandler::SelectFoundedServer(const std::string& compName, unsigned int port, const std::string& serverName)
 {

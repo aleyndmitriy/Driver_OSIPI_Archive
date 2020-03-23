@@ -713,13 +713,7 @@ void DrvOSIPIArchValues::HdaCommandHandler::SendMessageInfo(std::string&& messag
 
 }
 
-void DrvOSIPIArchValues::HdaCommandHandler::GetServers(std::vector<std::string>&& servers)
-{
-
-}
-
-
-void DrvOSIPIArchValues::HdaCommandHandler::GetAggregates(std::vector<std::pair<std::string, int> >&& aggregates)
+void DrvOSIPIArchValues::HdaCommandHandler::GetServers(std::vector<std::pair<std::string, long> >&& servers)
 {
 
 }

@@ -1,8 +1,6 @@
 #include"pch.h"
 #include "resource.h"	
 #include"ClientSettingsDialog.h"
-#include "BrowseNetworkServers.h"
-
 //#include"Log.h"
 #include "Utils.h"
 #include"Constants.h"
@@ -10,7 +8,7 @@
 IMPLEMENT_DYNAMIC(CClientSettingsDialog, CDialogEx)
 
 CClientSettingsDialog::CClientSettingsDialog(std::function<ODS::UI::IAbstractUIFacrory * (void)> uiFactiryGetter, std::shared_ptr<DrvOSIPIArchValues::IServerInteractor> interactor, std::shared_ptr<DrvOSIPIArchValues::ConnectionAttributes> attributes, std::shared_ptr<DrvOSIPIArchValues::DataTypeAttributes> dataAttributes, CWnd* pParent)
-	: CDialogEx(IDD_CLIENT_SETTINGS_DLG, pParent), m_uiFactoryGetter(uiFactiryGetter), m_connectAttributes(attributes), m_dataAttributes(dataAttributes), m_pInteractor(interactor), m_aggregates()
+	: CDialogEx(IDD_CLIENT_SETTINGS_DLG, pParent), m_uiFactoryGetter(uiFactiryGetter), m_connectAttributes(attributes), m_dataAttributes(dataAttributes), m_pInteractor(interactor)
 {
 	m_pInteractor->SetAttributes(m_connectAttributes);
 	m_pInteractor->SetDataAttributes(m_dataAttributes);
@@ -26,12 +24,10 @@ CClientSettingsDialog::~CClientSettingsDialog()
 void CClientSettingsDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_EDIT_COMPUTER_NAME, m_editComputerName);
 	DDX_Control(pDX, IDC_COMBO_SELECT_SERVER, m_cmbServerName);
 	DDX_Control(pDX, IDC_EDIT_PORT, m_editPort);
-	DDX_Control(pDX, IDC_COMBO_CONFIGURATION, m_cmbConfiguration);
 	DDX_Control(pDX, IDC_EDIT_LOGIN, m_editLogin);
-	DDX_Control(pDX, IDC_EDIT_USER_PASSWORD, m_editUserPassword);
+	DDX_Control(pDX, IDC_EDIT_PASSWORD, m_editUserPassword);
 	DDX_Control(pDX, IDC_COMBO_AGGREGATE, m_cmbAggregateType);
 	DDX_Control(pDX, IDC_EDIT_PROCESSING_INTERVAL, m_editProcessingInterval);
 	DDX_Control(pDX, IDC_SPIN_INTERVAL, m_spinTimeInterval);
@@ -41,18 +37,14 @@ void CClientSettingsDialog::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CClientSettingsDialog, CDialogEx)
-	ON_EN_CHANGE(IDC_EDIT_COMPUTER_NAME, &CClientSettingsDialog::OnEnChangeEditComputerName)
 	ON_CBN_SELCHANGE(IDC_COMBO_SELECT_SERVER, &CClientSettingsDialog::OnCbnSelchangeComboSelectServer)
 	ON_EN_CHANGE(IDC_EDIT_PORT, &CClientSettingsDialog::OnEnChangeEditPort)
 	ON_BN_CLICKED(IDC_BUTTON_BROWSE_NETWORK, &CClientSettingsDialog::OnBtnClickedButtonBrowseNetwork)
 	ON_BN_CLICKED(IDC_BUTTON_DISCOVER_SERVERS, &CClientSettingsDialog::OnBtnClickedButtonDiscoverServers)
-	ON_CBN_SELCHANGE(IDC_COMBO_CONFIGURATION, &CClientSettingsDialog::OnCbnSelChangeComboConfiguration)
 	ON_BN_CLICKED(IDC_BUTTON_TEST_CONNECTION, &CClientSettingsDialog::OnBtnClickedButtonTestConnection)
 	ON_BN_CLICKED(IDCANCEL, &CClientSettingsDialog::OnBtnClickedCancel)
 	ON_BN_CLICKED(IDOK, &CClientSettingsDialog::OnBtnClickedOk)
-	ON_BN_CLICKED(IDC_SERVER_PROPERTY_BUTTON, &CClientSettingsDialog::OnBtnClickedServerPropertyButton)
 	ON_CBN_EDITCHANGE(IDC_COMBO_SELECT_SERVER, &CClientSettingsDialog::OnCbnEditChangeComboSelectServer)
-	ON_CBN_DROPDOWN(IDC_COMBO_AGGREGATE, &CClientSettingsDialog::OnCbnDropDownComboAggregate)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_INTERVAL, &CClientSettingsDialog::OnDeltaPosSpinInterval)
 	ON_CBN_SELCHANGE(IDC_COMBO_READ_TYPE, &CClientSettingsDialog::OnCbnSelChangeComboReadType)
 	ON_EN_UPDATE(IDC_EDIT_DATA_QUALITY, &CClientSettingsDialog::OnEnUpdateEditDataQuality)
@@ -62,9 +54,7 @@ BOOL CClientSettingsDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	SetUpInitialState();
-	if (!m_connectAttributes->configuration.computerName.empty()) {
-		m_editComputerName.SetWindowTextA(m_connectAttributes->configuration.computerName.c_str());
-	}
+	
 	if (!m_connectAttributes->configuration.serverName.empty()) {
 		int ind = m_cmbServerName.AddString(m_connectAttributes->configuration.serverName.c_str());
 		m_cmbServerName.SetCurSel(ind);
@@ -74,20 +64,18 @@ BOOL CClientSettingsDialog::OnInitDialog()
 		m_editPort.SetWindowTextA(port.c_str());
 	}
 
-	if (!m_connectAttributes->configurationAccess.m_userLogin.m_login.empty() && m_connectAttributes->configurationAccess.m_userLogin.m_login.size() > 0) {
-		m_editLogin.SetWindowTextA(m_connectAttributes->configurationAccess.m_userLogin.m_login.c_str());
+	if (!m_connectAttributes->userAccess.m_login.empty() && m_connectAttributes->userAccess.m_login.size() > 0) {
+		m_editLogin.SetWindowTextA(m_connectAttributes->userAccess.m_login.c_str());
 	}
-	if (!m_connectAttributes->configurationAccess.m_userLogin.m_password.empty() && m_connectAttributes->configurationAccess.m_userLogin.m_password.size() > 0) {
-		m_editUserPassword.SetWindowTextA(m_connectAttributes->configurationAccess.m_userLogin.m_password.c_str());
+	if (!m_connectAttributes->userAccess.m_password.empty() && m_connectAttributes->userAccess.m_password.size() > 0) {
+		m_editUserPassword.SetWindowTextA(m_connectAttributes->userAccess.m_password.c_str());
 	}
 	
 
 	m_cmbReadType.SetCurSel(m_dataAttributes->m_iProcessed);
 	if (m_dataAttributes->m_iProcessed) {
 		ShowDataReadTypeView(TRUE);
-		int pos = m_cmbAggregateType.AddString(m_dataAttributes->m_pAggregateType.first.c_str());
-		m_cmbAggregateType.SetItemData(pos, m_dataAttributes->m_pAggregateType.second);
-		m_cmbAggregateType.SetCurSel(pos);
+		m_cmbAggregateType.SetCurSel(m_dataAttributes->m_pAggregateType.second);
 		unsigned int interval = (unsigned int)m_dataAttributes->m_dProcessingInterval;
 		SetDlgItemInt(IDC_EDIT_PROCESSING_INTERVAL, interval, FALSE);
 	}
@@ -106,17 +94,16 @@ BOOL CClientSettingsDialog::OnInitDialog()
 
 void CClientSettingsDialog::SetUpInitialState()
 {
-	m_editComputerName.SetSel(0, -1);
-	m_editComputerName.Clear();
+	m_pInteractor->SetOutput(shared_from_this());
 	m_editPort.SetSel(0, -1);
 	m_editPort.Clear();
-	m_cmbConfiguration.ResetContent();
 	m_editLogin.SetSel(0, -1);
 	m_editLogin.Clear();
 	m_editUserPassword.SetSel(0, -1);
 	m_editUserPassword.Clear();
 	m_cmbReadType.SetCurSel(0);
 	m_cmbAggregateType.ResetContent();
+	fillAggregateList();
 	m_editProcessingInterval.SetSel(0, -1);
 	m_editProcessingInterval.Clear();
 	m_editDataQuality.SetSel(0, -1);
@@ -137,10 +124,7 @@ void CClientSettingsDialog::ShowDataReadTypeView(BOOL bShow)
 }
 
 
-void CClientSettingsDialog::OnEnChangeEditComputerName()
-{
-	ClearAggregateListView();
-}
+
 
 
 void CClientSettingsDialog::OnCbnEditChangeComboSelectServer()
@@ -148,47 +132,35 @@ void CClientSettingsDialog::OnCbnEditChangeComboSelectServer()
 	if (m_cmbServerName.GetCount() > 0) {
 		m_cmbServerName.ResetContent();
 	}
-	ClearAggregateListView();
+	
 }
 
 void CClientSettingsDialog::OnCbnSelchangeComboSelectServer()
 {
-	ClearAggregateListView();
-	StartLoading();
+	int curSel = m_cmbServerName.GetCurSel();
+	if (curSel > -1) {
+		long port = m_cmbServerName.GetItemData(curSel);
+		std::string strPort = std::to_string(port);
+		m_editPort.SetWindowTextA(strPort.c_str());
+	}
 	ReadAttributes();
-	
 }
 
 
 void CClientSettingsDialog::OnEnChangeEditPort()
 {
-	ClearAggregateListView();
+	
 }
 
 
 void CClientSettingsDialog::OnBtnClickedButtonBrowseNetwork()
 {
-	/*TCHAR szPathname[_MAX_PATH];
-	BROWSEINFOA brs;
-	brs.hwndOwner = this->m_hWnd;
-	brs.pidlRoot = NULL;
-	brs.pszDisplayName = szPathname;
-	brs.lpszTitle = TEXT("Select Computer Name");
-	brs.ulFlags = BIF_NONEWFOLDERBUTTON | BIF_BROWSEFORCOMPUTER;
-	brs.lpfn = NULL;
-	LPITEMIDLIST list = SHBrowseForFolderA(&brs);
-	if (list != NULL) {
-		m_editComputerName.SetWindowTextA(szPathname);
-	}*/
-	ClearAggregateListView();
-	CBrowseNetworkServers dlg = CBrowseNetworkServers(this);
-	int response = dlg.DoModal();
-	if (response == IDOK) {
-		CString path = dlg.GetPath();
-		int len = path.GetLength();
-		if (len > 0) {
-			m_editComputerName.SetWindowTextA(path.GetBuffer(len));
-		}
+	StartLoading();
+	m_cmbServerName.ResetContent();
+	m_editPort.SetSel(0, -1);
+	m_editPort.Clear();
+	if (m_pInteractor) {
+		m_pInteractor->GetConnectedServers(&(this->m_hWnd));
 	}
 }
 
@@ -196,22 +168,14 @@ void CClientSettingsDialog::OnBtnClickedButtonBrowseNetwork()
 void CClientSettingsDialog::OnBtnClickedButtonDiscoverServers()
 {
 	StartLoading();
-	ClearAggregateListView();
-	ReadAttributes();
-	m_cmbConfiguration.ResetContent();
 	m_cmbServerName.ResetContent();
+	m_editPort.SetSel(0, -1);
+	m_editPort.Clear();
 	if (m_pInteractor) {
-		m_pInteractor->GetServers();
+		m_pInteractor->GetAllServers();
 	}
 }
 
-
-void CClientSettingsDialog::OnCbnSelChangeComboConfiguration()
-{
-	ClearAggregateListView();
-	StartLoading();
-	ReadAttributes();
-}
 
 void CClientSettingsDialog::OnBtnClickedButtonTestConnection()
 {
@@ -222,35 +186,6 @@ void CClientSettingsDialog::OnBtnClickedButtonTestConnection()
 	}
 }
 
-void CClientSettingsDialog::OnBtnClickedServerPropertyButton()
-{
-	CString str;
-	int len = m_cmbServerName.GetWindowTextLengthA();
-	m_cmbServerName.GetWindowTextA(str);
-	str.Trim();
-	if (str.IsEmpty()) {
-		return;
-	}
-	StartLoading();
-
-	std::string endPointName = std::string(str.GetBuffer(str.GetLength()));
-	
-	if (m_pInteractor) {
-		
-	}
-}
-
-void CClientSettingsDialog::OnCbnDropDownComboAggregate()
-{
-	if (m_aggregates.empty()) {
-		m_cmbAggregateType.ResetContent();
-		StartLoading();
-		ReadAttributes();
-		if (m_pInteractor) {
-			m_pInteractor->GetAggregates();
-		}
-	}
-}
 
 
 void CClientSettingsDialog::OnDeltaPosSpinInterval(NMHDR* pNMHDR, LRESULT* pResult)
@@ -273,7 +208,6 @@ void CClientSettingsDialog::OnCbnSelChangeComboReadType()
 {
 	BOOL isProcessed = m_cmbReadType.GetCurSel();
 	if (!isProcessed) {
-		m_cmbAggregateType.ResetContent();
 		m_editProcessingInterval.SetSel(0, -1);
 		m_editProcessingInterval.Clear();
 	}
@@ -347,20 +281,15 @@ void CClientSettingsDialog::StopLoading()
 void CClientSettingsDialog::ReadAttributes()
 {
 	CString str;
-	int len = m_editComputerName.GetWindowTextLengthA();
-	m_editComputerName.GetWindowTextA(str);
-	m_connectAttributes->configuration.computerName = std::string(str.GetBuffer(len));
-	if (m_connectAttributes->configuration.computerName.empty()) {
-		m_connectAttributes->configuration.computerName = std::string("localhost");
-		m_editComputerName.SetWindowTextA(m_connectAttributes->configuration.computerName.c_str());
+	int len = 0;
+	int curSel = m_cmbServerName.GetCurSel();
+	if (curSel > -1) {
+		len = m_cmbServerName.GetLBTextLen(curSel);
+		m_cmbServerName.GetLBText(curSel, str);
+		m_connectAttributes->configuration.serverName = std::string(str.GetBuffer(len));
+		str.ReleaseBuffer();
+		str.Empty();
 	}
-	str.ReleaseBuffer();
-	str.Empty();
-	len = m_cmbServerName.GetWindowTextLengthA();
-	m_cmbServerName.GetWindowTextA(str);
-	m_connectAttributes->configuration.serverName = std::string(str.GetBuffer(len));
-	str.ReleaseBuffer();
-	str.Empty();
 	len = m_editPort.GetWindowTextLengthA();
 	m_editPort.GetWindowTextA(str);
 	std::string port = std::string(str.GetBuffer(len));
@@ -369,20 +298,15 @@ void CClientSettingsDialog::ReadAttributes()
 	}
 	str.ReleaseBuffer();
 	str.Empty();
-	len = m_cmbConfiguration.GetWindowTextLengthA();
-	m_cmbConfiguration.GetWindowTextA(str);
-	
-	str.ReleaseBuffer();
-	str.Empty();
 	
 	len = m_editLogin.GetWindowTextLengthA();
 	m_editLogin.GetWindowTextA(str);
-	m_connectAttributes->configurationAccess.m_userLogin.m_login = std::string(str.GetBuffer(len));
+	m_connectAttributes->userAccess.m_login = std::string(str.GetBuffer(len));
 	str.ReleaseBuffer();
 	str.Empty();
 	len = m_editUserPassword.GetWindowTextLengthA();
 	m_editUserPassword.GetWindowTextA(str);
-	m_connectAttributes->configurationAccess.m_userLogin.m_password = std::string(str.GetBuffer(len));
+	m_connectAttributes->userAccess.m_password = std::string(str.GetBuffer(len));
 	str.ReleaseBuffer();
 	str.Empty();
 	
@@ -423,12 +347,24 @@ void CClientSettingsDialog::ReadAttributes()
 	}
 }
 
-void CClientSettingsDialog::ClearAggregateListView()
-{
-	m_aggregates.clear();
-	m_cmbAggregateType.ResetContent();
-}
 
+void CClientSettingsDialog::fillAggregateList()
+{
+	int pos = m_cmbAggregateType.AddString(OSI_PI_AGGREGATE_TOTAL);
+	m_cmbAggregateType.SetItemData(pos, 0);
+	pos = m_cmbAggregateType.AddString(OSI_PI_AGGREGATE_MINIMUM);
+	m_cmbAggregateType.SetItemData(pos, 1);
+	pos = m_cmbAggregateType.AddString(OSI_PI_AGGREGATE_MAXIMUM);
+	m_cmbAggregateType.SetItemData(pos, 2);
+	pos = m_cmbAggregateType.AddString(OSI_PI_AGGREGATE_STDEV);
+	m_cmbAggregateType.SetItemData(pos, 3);
+	pos = m_cmbAggregateType.AddString(OSI_PI_AGGREGATE_RANGE);
+	m_cmbAggregateType.SetItemData(pos, 4);
+	pos = m_cmbAggregateType.AddString(OSI_PI_AGGREGATE_AVERAGE);
+	m_cmbAggregateType.SetItemData(pos, 5);
+	pos = m_cmbAggregateType.AddString(OSI_PI_AGGREGATE_MEAN);
+	m_cmbAggregateType.SetItemData(pos, 6);
+}
 
 void CClientSettingsDialog::SendMessageError(std::string&& message)
 {
@@ -447,36 +383,23 @@ void CClientSettingsDialog::SendMessageInfo(std::string&& message)
 	StopLoading();
 }
 
-void CClientSettingsDialog::GetServers(std::vector<std::string>&& servers)
+void CClientSettingsDialog::GetServers(std::vector<std::pair<std::string, long> >&& servers)
 {
 	m_cmbServerName.ResetContent();
-	size_t index = 0;
-	for (std::vector<std::string>::const_iterator itr = servers.cbegin(); itr != servers.cend(); ++itr)
+	m_editPort.SetSel(0, -1);
+	m_editPort.Clear();
+	for (std::vector<std::pair<std::string, long> >::const_iterator itr = servers.cbegin(); itr != servers.cend(); ++itr)
 	{
-		int pos = m_cmbServerName.AddString(itr->c_str());
-		m_cmbServerName.SetItemData(pos, index++);
-	}
-
-	StopLoading();
-}
-
-
-void CClientSettingsDialog::GetAggregates(std::vector<std::pair<std::string, int> >&& aggregates)
-{
-	ClearAggregateListView();
-	for (std::vector<std::pair<std::string, int> >::const_iterator itr = aggregates.cbegin(); itr != aggregates.cend(); ++itr)
-	{
-		int pos = m_cmbAggregateType.AddString(itr->first.c_str());
-		m_cmbAggregateType.SetItemData(pos, itr->second);
-		m_aggregates.push_back(*itr);
+		int pos = m_cmbServerName.AddString(itr->first.c_str());
+		m_cmbServerName.SetItemData(pos, itr->second);
 	}
 	StopLoading();
 }
+
 
 void CClientSettingsDialog::SelectFoundedServer(const std::string& compName, unsigned int port, const std::string& serverName)
 {
 
-	m_editComputerName.SetWindowTextA(compName.c_str());
 	std::string strPort = std::to_string(port);
 	m_editPort.SetWindowTextA(strPort.c_str());
 	if (m_cmbServerName.GetCount() > 0) {

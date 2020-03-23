@@ -7,13 +7,12 @@ bool DrvOSIPIArchValues::XMLSettingsDataSource::Save(const ConnectionAttributes&
 	pugi::xml_document doc;
 	pugi::xml_node rootNode = doc.append_child("Settings");
 	pugi::xml_node serverNode = rootNode.append_child("ServerConfiguration");
-	serverNode.append_attribute("Computer").set_value(connectionAttributes.configuration.computerName.c_str());
 	serverNode.append_attribute("Server").set_value(connectionAttributes.configuration.serverName.c_str());
 	serverNode.append_attribute("Port").set_value(connectionAttributes.configuration.port);
 	
 	pugi::xml_node connectionNode = rootNode.append_child("SecurityAccessConfiguration");
-	connectionNode.append_attribute("UserName").set_value(connectionAttributes.configurationAccess.m_userLogin.m_login.c_str());
-	std::string encryptUserPass = connectionAttributes.configurationAccess.m_userLogin.m_password;
+	connectionNode.append_attribute("UserName").set_value(connectionAttributes.userAccess.m_login.c_str());
+	std::string encryptUserPass = connectionAttributes.userAccess.m_password;
 	connectionNode.append_attribute("UserPassword").set_value(encryptUserPass.c_str());
 	
 
@@ -41,20 +40,18 @@ bool DrvOSIPIArchValues::XMLSettingsDataSource::Load(ConnectionAttributes& conne
 	}
 	pugi::xml_node rootNode = doc.child("Settings");
 	pugi::xml_node serverNode = rootNode.child("ServerConfiguration");
-	std::string computerName = std::string(serverNode.attribute("Computer").as_string());
 	std::string serverName = std::string(serverNode.attribute("Server").as_string());
 	unsigned int port = serverNode.attribute("Port").as_uint();
-	ServerConfiguration serverConfiguration(computerName, serverName, port);
+	ServerConfiguration serverConfiguration(serverName, port);
 
 	
 	pugi::xml_node connectionNode = rootNode.child("SecurityAccessConfiguration");
 	std::string loginName = std::string(connectionNode.attribute("UserName").as_string());
 	std::string loginPass = std::string(connectionNode.attribute("UserPassword").as_string());
 	SecurityUserNameAccess userAccess(loginName, loginPass);
-	SecurityAccessConfiguration configurationAccess(userAccess);
 
 	connectionAttributes.configuration = serverConfiguration;
-	connectionAttributes.configurationAccess = configurationAccess;
+	connectionAttributes.userAccess = userAccess;
 
 	rootNode = doc.child("DataType");
 	pugi::xml_node processedNode = rootNode.child("ReadType");
@@ -88,20 +85,18 @@ bool DrvOSIPIArchValues::XMLSettingsDataSource::LoadAttributesString(const char*
 	}
 	pugi::xml_node rootNode = doc.child("Settings");
 	pugi::xml_node serverNode = rootNode.child("ServerConfiguration");
-	std::string computerName = std::string(serverNode.attribute("Computer").as_string());
 	std::string serverName = std::string(serverNode.attribute("Server").as_string());
 	unsigned int port = serverNode.attribute("Port").as_uint();
-	ServerConfiguration serverConfiguration(computerName, serverName, port);
+	ServerConfiguration serverConfiguration(serverName, port);
 
 
 	pugi::xml_node connectionNode = rootNode.child("SecurityAccessConfiguration");
 	std::string loginName = std::string(connectionNode.attribute("UserName").as_string());
 	std::string loginPass = std::string(connectionNode.attribute("UserPassword").as_string());
 	SecurityUserNameAccess userAccess(loginName, loginPass);
-	SecurityAccessConfiguration configurationAccess(userAccess);
 
 	connectionAttributes.configuration = serverConfiguration;
-	connectionAttributes.configurationAccess = configurationAccess;
+	connectionAttributes.userAccess = userAccess;
 
 	rootNode = doc.child("DataType");
 	pugi::xml_node processedNode = rootNode.child("ReadType");

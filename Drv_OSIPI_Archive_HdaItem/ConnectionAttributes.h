@@ -6,12 +6,9 @@ namespace DrvOSIPIArchValues
 {
 
 	struct ServerConfiguration {
-		std::string computerName;
 		std::string serverName;
 		unsigned int port;
-		ServerConfiguration(const std::string& computer, const std::string& server, unsigned int number);
-		ServerConfiguration(const std::string& computer, unsigned int number);
-		ServerConfiguration(const std::string& computer);
+		ServerConfiguration(const std::string& server, unsigned int number);
 		ServerConfiguration();
 		~ServerConfiguration();
 		ServerConfiguration(const ServerConfiguration& src) = default;
@@ -38,25 +35,12 @@ namespace DrvOSIPIArchValues
 	bool operator!=(const SecurityUserNameAccess& lhs, const SecurityUserNameAccess& rhs);
 
 	
-	struct SecurityAccessConfiguration {
-		SecurityUserNameAccess m_userLogin;
-		
-		SecurityAccessConfiguration(const SecurityUserNameAccess& user);
-		SecurityAccessConfiguration();
-		~SecurityAccessConfiguration();
-		SecurityAccessConfiguration(const SecurityAccessConfiguration& src) = default;
-		SecurityAccessConfiguration& operator=(const SecurityAccessConfiguration& rhs) = default;
-		SecurityAccessConfiguration(SecurityAccessConfiguration&& src) = default;
-		SecurityAccessConfiguration& operator=(SecurityAccessConfiguration&& rhs) = default;
-	};
-
-	bool operator==(const SecurityAccessConfiguration& lhs, const SecurityAccessConfiguration& rhs);
-	bool operator!=(const SecurityAccessConfiguration& lhs, const SecurityAccessConfiguration& rhs);
+	
 
 	struct ConnectionAttributes {
 		ServerConfiguration configuration;
-		SecurityAccessConfiguration configurationAccess;
-		ConnectionAttributes(const ServerConfiguration& server, const SecurityAccessConfiguration& accessType);
+		SecurityUserNameAccess userAccess;
+		ConnectionAttributes(const ServerConfiguration& server, const SecurityUserNameAccess& accessType);
 		ConnectionAttributes(const ServerConfiguration& server);
 		ConnectionAttributes();
 		~ConnectionAttributes();

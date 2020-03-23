@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "PluginObjectFactory.h"
 #include <OdsErr.h>
-//#include "DSource.h"
+#include "DSource.h"
 #include"Constants.h"
+#include"XMLSettingsDataSource.h"
+#include"PIServerInteractor.h"
 
 DrvOSIPIArchValues::PluginObjectFactory& DrvOSIPIArchValues::PluginObjectFactory::GetInstance()
 {
@@ -21,7 +23,7 @@ int DrvOSIPIArchValues::PluginObjectFactory::CreateObject(const TCHAR* szObjKey,
 	if (_tcscmp(szObjKey, OSI_PI_HIST_VALUES)) {
 		return ODS::ERR::BAD_PARAM;
 	}
-	//*ppPluginObj = new CDSource(std::make_shared<XMLSettingsDataSource>(), std::make_shared<PIServerInteractor>());
+	*ppPluginObj = new CDSource(std::make_shared<XMLSettingsDataSource>(), std::make_shared<PIServerInteractor>());
 	if (*ppPluginObj)
 		return ODS::ERR::OK;
 	else

@@ -16,7 +16,8 @@ namespace DrvOSIPIArchValues
 		virtual void SetAttributes(std::shared_ptr<ConnectionAttributes> attributes) = 0;
 		virtual void SetDataAttributes(std::shared_ptr<DataTypeAttributes> attributes) = 0;
 		virtual void SetOutput(std::shared_ptr<IServerInteractorOutput> output) = 0;
-		virtual void GetServers() = 0;
+		virtual void GetConnectedServers(void* output) = 0;
+		virtual void GetAllServers() = 0;
 		virtual void GetAggregates() = 0 ;
 		virtual void ChooseCurrentServer() = 0;
 		virtual void OpenConnectionWithUUID(const std::string& connectionID) = 0;

@@ -32,9 +32,7 @@ namespace DrvOSIPIArchValues
 		void SendMessageError(std::string&& message) override;
 		void SendWarning(std::string&& message) override;
 		void SendMessageInfo(std::string&& message) override;
-		void GetServers(std::vector<std::string>&& servers) override;
-		
-		void GetAggregates(std::vector<std::pair<std::string, int> >&& aggregates) override;
+		void GetServers(std::vector<std::pair<std::string, long> >&& servers) override;
 		void SelectFoundedServer(const std::string& compName, unsigned int port, const std::string& serverName) override;
 		void GetNewConnectionGuide(std::string&& uuid) override;
 		void CloseConnectionWithGuide(std::string&& uuid) override;
