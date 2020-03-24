@@ -63,6 +63,6 @@ public:
 	void SendMessageInfo(std::string&& message) override;
 	void GetServers(std::vector<std::pair<std::string, long>>&& servers) override;
 	void SelectFoundedServer(const std::string& compName, unsigned int port, const std::string& serverName) override;
-	void GetNewConnectionGuide(std::string&& uuid) override;
-	void CloseConnectionWithGuide(std::string&& uuid) override;
+	void ConnectionOpened(bool isOpenned) override;
+	void ConnectionClosed(bool isClosed) override;
 };

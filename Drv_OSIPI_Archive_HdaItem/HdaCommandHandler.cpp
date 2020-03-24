@@ -94,7 +94,6 @@ int DrvOSIPIArchValues::HdaCommandHandler::HandleOpenSession(ODS::HdaFunction* p
 	pSession->SetContext(pFunc->GetContext());
 	ODS::Core::Uuid sessionId;
 	std::string uuid = std::string(sessionId.ToString().GetString());
-	m_pInteractor->OpenConnectionWithUUID(uuid);
 	std::vector<std::string>::const_iterator findIterator =
 		std::find_if(m_connectionsList.cbegin(), m_connectionsList.cend(), [&](const std::string& existingUuid) {
 		return existingUuid == uuid; });
@@ -145,7 +144,6 @@ int DrvOSIPIArchValues::HdaCommandHandler::HandleCloseSession(ODS::HdaFunction* 
 		std::find_if(m_connectionsList.cbegin(), m_connectionsList.cend(), [&](const std::string& existingUuid) {
 		return existingUuid == uuid; });
 	if (findIterator != m_connectionsList.cend()) {
-		m_pInteractor->CloseConnectionWithUUID(uuid);
 		Log::GetInstance()->WriteInfo(_T("Close session ok,  session id %s"), (LPCTSTR)sessionId.ToString());
 		ODS::HdaFunctionResultSession* pSession = new ODS::HdaFunctionResultSession;
 		pSession->SetContext(pFunc->GetContext());
@@ -724,29 +722,12 @@ void DrvOSIPIArchValues::HdaCommandHandler::SelectFoundedServer(const std::strin
 
 }
 
-void DrvOSIPIArchValues::HdaCommandHandler::GetNewConnectionGuide(std::string&& uuid)
+void DrvOSIPIArchValues::HdaCommandHandler::ConnectionOpened(bool isOpened)
 {
-	if (uuid.empty() == false) {
-		std::vector<std::string>::const_iterator findIterator =
-			std::find_if(m_connectionsList.cbegin(), m_connectionsList.cend(), [&](const std::string& existingUuid) {
-			return existingUuid == uuid; });
-		if (findIterator == m_connectionsList.cend()) {
-			m_connectionsList.push_back(uuid);
-		}
-	}
+	
 }
 
-void DrvOSIPIArchValues::HdaCommandHandler::CloseConnectionWithGuide(std::string&& uuid)
+void DrvOSIPIArchValues::HdaCommandHandler::ConnectionClosed(bool isClosed)
 {
-	if (uuid.empty() == false) {
-		std::vector<std::string>::const_iterator findIterator =
-			std::find_if(m_connectionsList.cbegin(), m_connectionsList.cend(), [&](const std::string& existingUuid) {
-			return existingUuid == uuid; });
-		if (findIterator != m_connectionsList.cend()) {
-			m_connectionsList.erase(findIterator);
-		}
-		else {
-			Log::GetInstance()->WriteInfo(_T("Can't find session,  with session id %s"), (LPCTSTR)uuid.c_str());
-		}
-	}
+	
 }

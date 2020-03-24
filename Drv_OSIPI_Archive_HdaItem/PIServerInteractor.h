@@ -24,11 +24,9 @@ namespace DrvOSIPIArchValues
 		void GetAllServers() override;
 		void GetAggregates() override;
 		void ChooseCurrentServer() override;
-		void OpenConnectionWithUUID(const std::string& connectionID) override;
-		void CloseConnectionWithUUID(const std::string& connectionID) override;
 		void OpenConnection() override;
 		void TestConnection() override;
-		void GetTags(std::set<TagInfo>& tags, std::vector<std::string>& tagsPath, const std::string& connectionID) override;
+		void GetTags(std::set<TagInfo>& tags, std::vector<std::string>& tagsPath) override;
 		void GetRecords(std::map<std::string, std::vector<Record> >& tagsData, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime,
 			const std::map<std::string, std::vector<std::string> >& fullPaths, const std::string& connectionID) override;
 	private:
@@ -36,5 +34,6 @@ namespace DrvOSIPIArchValues
 		std::shared_ptr<DataTypeAttributes> m_pDataAttributes;
 		std::weak_ptr<IServerInteractorOutput> m_pOutput;
 		bool startApplication();
+		void openConnection(const std::string& message);
 	};
 }

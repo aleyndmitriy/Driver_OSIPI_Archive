@@ -408,15 +408,12 @@ void CClientSettingsDialog::SelectFoundedServer(const std::string& compName, uns
 	ReadAttributes();
 }
 
-void CClientSettingsDialog::GetNewConnectionGuide(std::string&& uuid)
+void CClientSettingsDialog::ConnectionOpened(bool isOpenned)
 {
 
-	if (uuid.empty()) {
-		//WarningMessage(std::string("Connection Test Succeed!"));
-	}
 }
 
-void CClientSettingsDialog::CloseConnectionWithGuide(std::string&& uuid)
+void CClientSettingsDialog::ConnectionClosed(bool isClosed)
 {
 
 }

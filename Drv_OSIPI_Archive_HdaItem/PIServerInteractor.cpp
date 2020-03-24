@@ -39,8 +39,6 @@ void DrvOSIPIArchValues::PIServerInteractor::GetConnectedServers(void* output)
 		HWND* ptrHandle = reinterpret_cast<HWND*>(output);
 		char* serverName = new char[MAX_NODENAME_LEN];
 		int32 len = MAX_NODENAME_LEN;
-		char* addressName = new char[MAX_NODENAME_LEN];
-		len = MAX_NODENAME_LEN;
 		int32 nodeId = 0;
 		int32 port = 0;
 		int32 res = pilg_connectdlg(*ptrHandle);
@@ -73,9 +71,6 @@ void DrvOSIPIArchValues::PIServerInteractor::GetConnectedServers(void* output)
 				out->SendMessageError(std::move(message));
 			}
 		}
-		piut_netserverinfo(serverName, len, addressName, len, &port);
-		//res = pilg_getdefserverinfo(serverName, &len, &nodeId,&port);
-		res = pilg_login(NULL, "admin", "WIN-CT79E7UNU02", "Shal1212", &nodeId);
 	}
 	
 }
@@ -131,51 +126,107 @@ void DrvOSIPIArchValues::PIServerInteractor::ChooseCurrentServer()
 }
 
 
-void DrvOSIPIArchValues::PIServerInteractor::OpenConnectionWithUUID(const std::string& connectionID)
+void DrvOSIPIArchValues::PIServerInteractor::OpenConnection()
 {
 	std::shared_ptr<IServerInteractorOutput> output = m_pOutput.lock();
 	if (startApplication()) {
-		
+		char* serverName = new char[MAX_NODENAME_LEN];
+		int32 len = MAX_NODENAME_LEN;
+		int32 nodeId = 0;
+		int32 port = 0;
+		int32 res = pilg_getconnectedserver(serverName, &len, &nodeId, &port, GETFIRST);
+		if (res < -1 || res > 1) {
+			if (output) {
+				std::string message("System error!");
+				output->SendMessageError(std::move(message));
+				return;
+			}
+		}
+		if (res == SUCCESS) {
+			if (std::string(serverName) == m_pServerAttributes->configuration.serverName) {
+				if (output) {
+					output->ConnectionOpened(true);
+				}
+				return;
+			}
+			while (res == SUCCESS) {
+				res = pilg_getconnectedserver(serverName, &len, &nodeId, &port, GETNEXT);
+				if (res == SUCCESS) {
+					if (std::string(serverName) == m_pServerAttributes->configuration.serverName) {
+						if (output) {
+							output->ConnectionOpened(true);
+						}
+						return;
+					}
+				}
+			}
+		}
+		else {
+			std::string message = std::string("Login Succeed!");
+			openConnection(message);
+		}
 	}
 	else {
 		if (output) {
-			std::string message("Application has not been started!");
-			output->SendMessageError(std::move(message));
-			output->GetNewConnectionGuide(std::string());
+			std::string message("Application is not registered!");
+			output->SendMessageInfo(std::move(message));
 		}
 	}
-}
-
-void DrvOSIPIArchValues::PIServerInteractor::CloseConnectionWithUUID(const std::string& connectionID)
-{
-
-}
-
-
-void DrvOSIPIArchValues::PIServerInteractor::OpenConnection()
-{
-	GUID guid;
-	if (CoCreateGuid(&guid) != S_OK) {
-		std::shared_ptr<IServerInteractorOutput> output = m_pOutput.lock();
-		if (output) {
-			std::string message("Can not create Guide!");
-			output->SendMessageError(std::move(message));
-			output->GetNewConnectionGuide(std::string());
-		}
-		return;
-	}
-	WCHAR strGuide[MAX_UUID_LENGTH];
-	int res = StringFromGUID2(guid, strGuide, MAX_UUID_LENGTH);
-	std::string key = std::string(Wstr2Str(std::wstring(strGuide)));
 }
 
 void DrvOSIPIArchValues::PIServerInteractor::TestConnection()
 {
-
+	std::shared_ptr<IServerInteractorOutput> output = m_pOutput.lock();
+	if (startApplication()) {
+		std::string message = std::string("Connection Test Succeed!");
+		openConnection(message);
+	}
+	else {
+		if (output) {
+			std::string message("Application is not registered!");
+			output->SendMessageInfo(std::move(message));
+		}
+	}
 }
 
+void DrvOSIPIArchValues::PIServerInteractor::openConnection(const std::string& message)
+{
+	std::shared_ptr<IServerInteractorOutput> output = m_pOutput.lock();
+	if (m_pServerAttributes->configuration.serverName.empty()) {
+		if (output) {
+			std::string message("Select server name!");
+			output->SendMessageInfo(std::move(message));
+			output->ConnectionOpened(false);
+		}
+		return;
+	}
+	LPCSTR userName = NULL;
+	LPCSTR password = NULL;
+	if (!m_pServerAttributes->userAccess.m_login.empty()) {
+		userName = m_pServerAttributes->userAccess.m_login.c_str();
+	}
+	if (!m_pServerAttributes->userAccess.m_password.empty()) {
+		password = m_pServerAttributes->userAccess.m_password.c_str();
+	}
+	int32 isValid = 0;
+	int32 res = pilg_login(NULL, userName, m_pServerAttributes->configuration.serverName.c_str(), password, &isValid);
+	if (res == SUCCESS) {
+		if (output) {
+			std::string messages = message;
+			output->SendWarning(std::move(messages));
+			output->ConnectionOpened(true);
+		}
+		return;
+	}
+	else {
+		if (output) {
+			output->SendMessageInfo(std::string("Login failed!"));
+			output->ConnectionOpened(false);
+		}
+	}
+}
 
-void DrvOSIPIArchValues::PIServerInteractor::GetTags(std::set<TagInfo>& tags, std::vector<std::string>& tagsPath, const std::string& connectionID)
+void DrvOSIPIArchValues::PIServerInteractor::GetTags(std::set<TagInfo>& tags, std::vector<std::string>& tagsPath)
 {
 	int32 isFound;
 	int32 pt;
@@ -204,7 +255,6 @@ void DrvOSIPIArchValues::PIServerInteractor::GetTags(std::set<TagInfo>& tags, st
 		if (output) {
 			std::string message("SystemError!");
 			output->SendMessageError(std::move(message));
-			output->GetNewConnectionGuide(std::string());
 		}
 	}
 	

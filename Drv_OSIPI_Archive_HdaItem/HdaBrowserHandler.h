@@ -34,13 +34,13 @@ namespace DrvOSIPIArchValues
 		void SendMessageInfo(std::string&& message) override;
 		void GetServers(std::vector<std::pair<std::string, long> >&& servers) override;
 		void SelectFoundedServer(const std::string& compName, unsigned int port, const std::string& serverName) override;
-		void GetNewConnectionGuide(std::string&& uuid) override;
-		void CloseConnectionWithGuide(std::string&& uuid) override;
+		void ConnectionOpened(bool isOpened) override;
+		void ConnectionClosed(bool isClosed) override;
 	private:
 		std::shared_ptr<ConnectionAttributes> m_pAttributes;
 		std::shared_ptr<DataTypeAttributes> m_pDataAttributes;
 		std::shared_ptr<IServerInteractor> m_pInteractor;
-		std::string m_ConnectionId;
+		bool m_bIsConnect;
 	};
 
 	STagItem mapFromHierarchicalTagInfo(const HierarchicalTagInfo& tag);

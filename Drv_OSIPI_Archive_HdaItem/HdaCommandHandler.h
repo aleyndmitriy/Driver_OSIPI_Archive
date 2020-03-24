@@ -33,8 +33,8 @@ namespace DrvOSIPIArchValues
 		void SendMessageInfo(std::string&& message) override;
 		void GetServers(std::vector<std::pair<std::string, long> >&& servers) override;
 		void SelectFoundedServer(const std::string& compName, unsigned int port, const std::string& serverName) override;
-		void GetNewConnectionGuide(std::string&& uuid) override;
-		void CloseConnectionWithGuide(std::string&& uuid) override;
+		void ConnectionOpened(bool isOpened) override;
+		void ConnectionClosed(bool isClosed) override;
 		void CreateQueriesList(const std::map<int, std::vector<ODS::HdaFunction*> >& requestFunctions, std::map<int, std::vector<ParamValueList> >& paramList, std::set<std::string>& tagsForQuery);
 		ParamValueList GetParameterValueList(const ODS::HdaFunction* pHdaFunc);
 		std::vector<ParamValueList> BuildCmdValueList(const std::vector<ODS::HdaFunction*>& rFuncList);

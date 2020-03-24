@@ -7,18 +7,14 @@
 #include<algorithm>
 #include"Utils.h"
 
-DrvOSIPIArchValues::BrowserHandler::BrowserHandler(std::shared_ptr<IServerInteractor> interactor) : m_pAttributes(nullptr), m_pInteractor(interactor), m_ConnectionId()
+DrvOSIPIArchValues::BrowserHandler::BrowserHandler(std::shared_ptr<IServerInteractor> interactor) : m_pAttributes(nullptr), m_pInteractor(interactor), m_bIsConnect(false)
 {
 
 }
 
 DrvOSIPIArchValues::BrowserHandler::~BrowserHandler()
 {
-	if (!m_ConnectionId.empty()) {
-		std::string connectionId(m_ConnectionId);
-		m_pInteractor->CloseConnectionWithUUID(connectionId);
-		Log::GetInstance()->WriteInfo(_T("Close connection with session id %s !"), (LPCTSTR)connectionId.c_str());
-	}
+	
 }
 
 int DrvOSIPIArchValues::BrowserHandler::Init(std::shared_ptr<ConnectionAttributes> attributes, std::shared_ptr<DataTypeAttributes> dataAttributes)
@@ -34,13 +30,13 @@ int DrvOSIPIArchValues::BrowserHandler::GetTagList(std::vector<ODS::OdsString>& 
 {
 	m_pInteractor->SetOutput(shared_from_this());
 	pTagList->clear();
-	if (m_ConnectionId.empty()) {
+	if (!m_bIsConnect) {
 		m_pInteractor->OpenConnection();
-		if (m_ConnectionId.empty()) {
+		if (!m_bIsConnect) {
 			Log::GetInstance()->WriteInfo(_T("Can't open connection!"));
 			return ODS::ERR::DB_CONNECTION_FAILED;
 		}
-		Log::GetInstance()->WriteInfo(_T("Open connection with session id %s !"), (LPCTSTR)m_ConnectionId.c_str());
+		Log::GetInstance()->WriteInfo(_T("Open connection successful!"));
 	}
 	std::set<TagInfo> tagsName;
 	std::vector<std::string> vec;
@@ -59,7 +55,7 @@ int DrvOSIPIArchValues::BrowserHandler::GetTagList(std::vector<ODS::OdsString>& 
 			});
 	}
 
-	m_pInteractor->GetTags(tagsName, vec, m_ConnectionId);
+	m_pInteractor->GetTags(tagsName, vec);
 	for (std::set<TagInfo>::const_iterator itr = tagsName.cbegin(); itr != tagsName.cend(); ++itr) {
 		ODS::OdsString szAddress(itr->m_strName.c_str());
 		STagItem sItem;
@@ -73,7 +69,6 @@ int DrvOSIPIArchValues::BrowserHandler::GetTagList(std::vector<ODS::OdsString>& 
 
 		sItem.m_vAddress.push_back(szAddress);
 		sItem.m_szDescription = ODS::OdsString(itr->m_strDescription.c_str());
-		sItem.m_nType = itr->m_iType;
 		pTagList->push_back(sItem);
 	}
 	return ODS::ERR::OK;
@@ -105,14 +100,14 @@ void DrvOSIPIArchValues::BrowserHandler::SelectFoundedServer(const std::string& 
 
 }
 
-void DrvOSIPIArchValues::BrowserHandler::GetNewConnectionGuide(std::string&& uuid)
+void DrvOSIPIArchValues::BrowserHandler::ConnectionOpened(bool isOpened)
 {
-	m_ConnectionId = uuid;
+	m_bIsConnect = isOpened;
 }
 
-void DrvOSIPIArchValues::BrowserHandler::CloseConnectionWithGuide(std::string&& uuid)
+void DrvOSIPIArchValues::BrowserHandler::ConnectionClosed(bool isClosed)
 {
-	m_ConnectionId.clear();
+	m_bIsConnect = !isClosed;
 }
 
 DrvOSIPIArchValues::STagItem DrvOSIPIArchValues::mapFromHierarchicalTagInfo(const HierarchicalTagInfo& tag)
