@@ -24,6 +24,6 @@ namespace DrvOSIPIArchValues
 		virtual void TestConnection() = 0;
 		virtual void GetTags(std::set<TagInfo>& tags, std::vector<std::string>& tagsPath) = 0;
 		virtual void GetRecords(std::map<std::string, std::vector<Record> >& tagsData, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime,
-			const std::map<std::string, std::vector<std::string> >& fullPaths, const std::string& connectionID) = 0;
+			const std::set<std::string>& tagNames, const std::string& connectionID) = 0;
 	};
 }

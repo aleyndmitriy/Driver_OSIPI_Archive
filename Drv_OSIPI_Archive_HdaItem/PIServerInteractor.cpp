@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include"Constants.h"
 #include<piapi.h>
+#include<piapix.h>
 
 DrvOSIPIArchValues::PIServerInteractor::PIServerInteractor(): m_pServerAttributes(), m_pDataAttributes(), m_pOutput()
 {
@@ -261,12 +262,61 @@ void DrvOSIPIArchValues::PIServerInteractor::GetTags(std::set<TagInfo>& tags, st
 }
 
 void DrvOSIPIArchValues::PIServerInteractor::GetRecords(std::map<std::string, std::vector<Record> >& tagsData, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime,
-	const std::map<std::string, std::vector<std::string> >& fullPaths, const std::string& connectionID)
+	const std::set<std::string>& tagNames, const std::string& connectionID)
 {
-
+	int32 startPiTime = PiTimeFromSysTime(startTime);
+	int32 endPiTime = PiTimeFromSysTime(endTime);
+	tagsData.clear();
+	int32 pt = 0;
+	int32 res;
+	int32 valCount = 0;
+	PIvaluetype type;
+	char tagName[MAX_TAGNAME_LEN];
+	std::vector<std::pair<int32, short> > vec;
+	std::shared_ptr<IServerInteractorOutput> output = m_pOutput.lock();
+	for (std::set<std::string>::const_iterator itr = tagNames.cbegin(); itr != tagNames.cend(); ++itr) {
+		res = pipt_findpoint(const_cast<char*>(itr->c_str()), &pt);
+		if (res == SUCCESS) {
+			res = pipt_pointtypex(pt, &type);
+			if (res == SUCCESS) {
+				/*valCount = 8000;
+				int32 times[8000];
+				times[0] = startPiTime;
+				times[7999] = endPiTime;
+				float rvals[8000];
+				int32 istats[8000];
+				res = piar_interpvalues(pt, &valCount, times, rvals, istats);
+				if (res == SUCCESS) {
+					for (int index = 0; index < 4000; ++index) {
+						res = istats[index];
+					}
+				}
+				res = piar_compvalues(pt, &valCount, times, rvals, istats,0);
+				if (res == SUCCESS) {
+					for (int index = 0; index < 4000; ++index) {
+						res = istats[index];
+					}
+				}*/
+			}
+		}
+	}
 }
 
 bool DrvOSIPIArchValues::PIServerInteractor::startApplication()
 {
 	return PIApplication::Instance().StartApplication();
+}
+
+int32 DrvOSIPIArchValues::PiTimeFromSysTime(const SYSTEMTIME& sysTime)
+{
+	int32 piTime;
+	int32 arrayTime[6];
+	arrayTime[0] = sysTime.wMonth;
+	arrayTime[1] = sysTime.wDay;
+	arrayTime[2] = sysTime.wYear;
+	arrayTime[3] = sysTime.wHour;
+	arrayTime[4] = sysTime.wMinute;
+	arrayTime[5] = sysTime.wSecond;
+	pitm_intsec(&piTime, arrayTime);
+	return piTime;
 }

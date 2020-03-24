@@ -28,7 +28,7 @@ namespace DrvOSIPIArchValues
 		void TestConnection() override;
 		void GetTags(std::set<TagInfo>& tags, std::vector<std::string>& tagsPath) override;
 		void GetRecords(std::map<std::string, std::vector<Record> >& tagsData, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime,
-			const std::map<std::string, std::vector<std::string> >& fullPaths, const std::string& connectionID) override;
+			const std::set<std::string>& tagNames, const std::string& connectionID) override;
 	private:
 		std::shared_ptr<ConnectionAttributes> m_pServerAttributes;
 		std::shared_ptr<DataTypeAttributes> m_pDataAttributes;
@@ -36,4 +36,7 @@ namespace DrvOSIPIArchValues
 		bool startApplication();
 		void openConnection(const std::string& message);
 	};
+
+	int32 PiTimeFromSysTime(const SYSTEMTIME& sysTime);
 }
+

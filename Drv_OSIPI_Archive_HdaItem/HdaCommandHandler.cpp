@@ -17,7 +17,7 @@
 #include<algorithm>
 #include<piapix.h>
 
-DrvOSIPIArchValues::HdaCommandHandler::HdaCommandHandler(std::shared_ptr<IServerInteractor> interactor) : m_pAttributes(nullptr), m_pDataAttributes(nullptr), m_pInteractor(interactor), m_connectionsList()
+DrvOSIPIArchValues::HdaCommandHandler::HdaCommandHandler(std::shared_ptr<IServerInteractor> interactor) : m_pAttributes(nullptr), m_pDataAttributes(nullptr), m_pInteractor(interactor)
 {
 
 }
@@ -94,19 +94,10 @@ int DrvOSIPIArchValues::HdaCommandHandler::HandleOpenSession(ODS::HdaFunction* p
 	pSession->SetContext(pFunc->GetContext());
 	ODS::Core::Uuid sessionId;
 	std::string uuid = std::string(sessionId.ToString().GetString());
-	std::vector<std::string>::const_iterator findIterator =
-		std::find_if(m_connectionsList.cbegin(), m_connectionsList.cend(), [&](const std::string& existingUuid) {
-		return existingUuid == uuid; });
-	if (findIterator == m_connectionsList.cend()) {
-		pSession->SetSessionId(ODS::Core::Uuid::EmptyUuid());
-		pSession->SetRc(ODS::ERR::DB_CONNECTION_FAILED);
-		Log::GetInstance()->WriteError(_T("Connect failed, %s"), (LPCTSTR)sessionId.ToString());
-	}
-	else {
-		pSession->SetSessionId(sessionId);
-		pSession->SetRc(ODS::ERR::OK);
-		Log::GetInstance()->WriteInfo(_T("OpenSession ok,  session id %s"), (LPCTSTR)sessionId.ToString());
-	}
+	m_pInteractor->OpenConnection();
+	pSession->SetSessionId(sessionId);
+	pSession->SetRc(ODS::ERR::OK);
+	Log::GetInstance()->WriteInfo(_T("OpenSession ok,  session id %s"), (LPCTSTR)sessionId.ToString());
 	pResultList->push_back(pSession);
 	Log::GetInstance()->WriteInfo(_T("Finish server executing commands."));
 	return ODS::ERR::OK;
@@ -139,24 +130,13 @@ int DrvOSIPIArchValues::HdaCommandHandler::HandleCloseSession(ODS::HdaFunction* 
 		Log::GetInstance()->WriteInfo(_T("Finish server executing commands."));
 		return ODS::ERR::BAD_PARAM;
 	}
-	std::string uuid = std::string(sessionId.ToString().GetString());
-	std::vector<std::string>::const_iterator findIterator =
-		std::find_if(m_connectionsList.cbegin(), m_connectionsList.cend(), [&](const std::string& existingUuid) {
-		return existingUuid == uuid; });
-	if (findIterator != m_connectionsList.cend()) {
-		Log::GetInstance()->WriteInfo(_T("Close session ok,  session id %s"), (LPCTSTR)sessionId.ToString());
-		ODS::HdaFunctionResultSession* pSession = new ODS::HdaFunctionResultSession;
-		pSession->SetContext(pFunc->GetContext());
-		pSession->SetRc(ODS::ERR::OK);
-		pResultList->push_back(pSession);
-		Log::GetInstance()->WriteInfo(_T("Finish server executing commands."));
-		return ODS::ERR::OK;
-	}
-	else {
-		Log::GetInstance()->WriteInfo(_T("Can't close session with id %s"), (LPCTSTR)sessionId.ToString());
-		Log::GetInstance()->WriteInfo(_T("Finish server executing commands."));
-		return ODS::ERR::DB_CONNECTION_FAILED;
-	}
+	Log::GetInstance()->WriteInfo(_T("Close session ok,  session id %s"), (LPCTSTR)sessionId.ToString());
+	ODS::HdaFunctionResultSession* pSession = new ODS::HdaFunctionResultSession;
+	pSession->SetContext(pFunc->GetContext());
+	pSession->SetRc(ODS::ERR::OK);
+	pResultList->push_back(pSession);
+	Log::GetInstance()->WriteInfo(_T("Finish server executing commands."));
+	return ODS::ERR::OK;
 }
 
 int DrvOSIPIArchValues::HdaCommandHandler::ExecuteCommand(ODS::HdaCommand* pCommand, ODS::HdaFunction* funcList, int listSize, std::vector<ODS::HdaFunctionResult*>* pResultList)
@@ -274,15 +254,10 @@ void DrvOSIPIArchValues::HdaCommandHandler::ExecuteQueriesList(const std::map<in
 	const std::set<std::string>& tagsForQuery, std::vector<ODS::HdaFunctionResult*>* pResultList, const SYSTEMTIME& startTime,
 	const SYSTEMTIME& endTime, const std::string& sessionId)
 {
-	std::map<std::string, std::vector<std::string> > fullPaths;
-	for (std::set<std::string>::const_iterator queriesIterator = tagsForQuery.cbegin(); queriesIterator != tagsForQuery.cend(); ++queriesIterator) {
-		std::pair<std::string, std::vector<std::string> > pair = std::make_pair<std::string, std::vector<std::string> >(std::string(*queriesIterator), split(*queriesIterator, std::string("/")));
-		fullPaths.insert(pair);
-	}
 	std::map<std::string, std::vector<Record> > tagsData;
 	std::chrono::time_point<std::chrono::steady_clock> startReceivingRecords = std::chrono::high_resolution_clock::now();
 	Log::GetInstance()->WriteInfo(_T("Start receiving records..."));
-	m_pInteractor->GetRecords(tagsData, startTime, endTime, fullPaths, sessionId);
+	m_pInteractor->GetRecords(tagsData, startTime, endTime, tagsForQuery, sessionId);
 	for (std::map<std::string, std::vector<Record> >::const_iterator itrInfo = tagsData.cbegin(); itrInfo != tagsData.cend(); itrInfo++) {
 		Log::GetInstance()->WriteInfo(_T("Tag %s has %d values"), (LPCTSTR)(itrInfo->first.c_str()), itrInfo->second.size());
 	}

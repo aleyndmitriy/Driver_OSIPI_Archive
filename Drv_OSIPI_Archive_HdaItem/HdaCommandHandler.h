@@ -23,7 +23,6 @@ namespace DrvOSIPIArchValues
 		std::shared_ptr<ConnectionAttributes> m_pAttributes;
 		std::shared_ptr<DataTypeAttributes> m_pDataAttributes;
 		std::shared_ptr<IServerInteractor> m_pInteractor;
-		std::vector<std::string> m_connectionsList;
 		int ExecuteCommand(ODS::HdaCommand* pCommand, ODS::HdaFunction* funcList, int listSize, std::vector<ODS::HdaFunctionResult*>* pResultList);
 		int AnalyzeCommand(ODS::HdaCommand* pCommand, ODS::HdaFunction* funcList, int listSize, std::map<int, std::vector<ODS::HdaFunction*> >& requestMap);
 		int HandleOpenSession(ODS::HdaFunction* pFunc, std::vector<ODS::HdaFunctionResult*>* pResultList);
