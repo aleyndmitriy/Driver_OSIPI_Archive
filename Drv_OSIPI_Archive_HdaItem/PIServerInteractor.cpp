@@ -342,15 +342,27 @@ void DrvOSIPIArchValues::PIServerInteractor::getProcessedData(int32 pt, int32 co
 	float rVal;
 	float percent;
 	int32 start = startTime;
-	int32 end = endTime;
-	PITIMESTAMP piStartTime;
-	ZeroMemory(&piStartTime, sizeof(PITIMESTAMP));
-	int32 timeArray[6];
-	pitm_secint(startTime, timeArray);
-	int res = pitm_settime(&piStartTime, timeArray[2], timeArray[0], timeArray[1], timeArray[3], timeArray[4], timeArray[5]);
-	res = piar_summary(pt, &start, &end, &rVal, &percent, code);
-	if (res == SUCCESS) {
-		vecRecords.push_back(mapRecordFromDataValue(PI_Type_float32, rVal,0, NULL, 0, piStartTime, 0, 0));
+	
+	int32 interval = endTime - startTime;
+	int procInterval = processedInterval / 1000;
+	if (procInterval > 1 && procInterval < interval) {
+		interval = procInterval;
+	}
+	int32 end = start + interval;
+	int32 step = 0;
+	while (start < endTime) {
+		PITIMESTAMP piStartTime;
+		ZeroMemory(&piStartTime, sizeof(PITIMESTAMP));
+		int32 timeArray[6];
+		pitm_secint(start, timeArray);
+		int res = pitm_settime(&piStartTime, timeArray[2], timeArray[0], timeArray[1], timeArray[3], timeArray[4], timeArray[5]);
+		res = piar_summary(pt, &start, &end, &rVal, &percent, code);
+		if (res == SUCCESS) {
+			vecRecords.push_back(mapRecordFromDataValue(PI_Type_float32, rVal, 0, NULL, 0, piStartTime, 0, 0));
+		}
+		step++;
+		start = startTime + step * interval;
+		end = start + interval;
 	}
 }
 
