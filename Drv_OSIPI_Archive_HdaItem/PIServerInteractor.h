@@ -5,6 +5,8 @@
 #include"IServerInteractor.h"
 #include "Record.h"
 #include"TagInfo.h"
+#include<piapi.h>
+#include<piapix.h>
 
 namespace DrvOSIPIArchValues
 {
@@ -35,8 +37,13 @@ namespace DrvOSIPIArchValues
 		std::weak_ptr<IServerInteractorOutput> m_pOutput;
 		bool startApplication();
 		void openConnection(const std::string& message);
+		void getRawData(int32 pt, PIvaluetype type, PITIMESTAMP* startTime, PITIMESTAMP* endTime, std::vector<Record>& vecRecords);
+		void getProcessedData(int32 pt, int32 code, int32 startTime, int32 endTime, double processedInterval, std::vector<Record>& vecRecords);
 	};
 
 	int32 PiTimeFromSysTime(const SYSTEMTIME& sysTime);
+	int32 PiTimeFromPiTimeStamp(const PITIMESTAMP& sysTime);
+	Record mapRecordFromDataValue(PIvaluetype type, double dValue, int32 iVal, char* strVal, uint32 strSize, const PITIMESTAMP& piTime,
+		int32 iStat, int16 iFlag);
 }
 

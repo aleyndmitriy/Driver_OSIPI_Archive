@@ -2,8 +2,7 @@
 #include"PIServerInteractor.h"
 #include "Utils.h"
 #include"Constants.h"
-#include<piapi.h>
-#include<piapix.h>
+
 
 DrvOSIPIArchValues::PIServerInteractor::PIServerInteractor(): m_pServerAttributes(), m_pDataAttributes(), m_pOutput()
 {
@@ -264,14 +263,19 @@ void DrvOSIPIArchValues::PIServerInteractor::GetTags(std::set<TagInfo>& tags, st
 void DrvOSIPIArchValues::PIServerInteractor::GetRecords(std::map<std::string, std::vector<Record> >& tagsData, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime,
 	const std::set<std::string>& tagNames, const std::string& connectionID)
 {
+	int32 res = 0;
 	int32 startPiTime = PiTimeFromSysTime(startTime);
 	int32 endPiTime = PiTimeFromSysTime(endTime);
+	PITIMESTAMP piStartTime;
+	ZeroMemory(&piStartTime, sizeof(PITIMESTAMP));
+	res = pitm_settime(&piStartTime, startTime.wYear, startTime.wMonth, startTime.wDay, startTime.wHour, startTime.wMinute, startTime.wSecond);
+	PITIMESTAMP piEndTime;
+	ZeroMemory(&piEndTime, sizeof(PITIMESTAMP));
+	res = pitm_settime(&piEndTime, endTime.wYear, endTime.wMonth, endTime.wDay, endTime.wHour, endTime.wMinute, endTime.wSecond);
+	
 	tagsData.clear();
 	int32 pt = 0;
-	int32 res;
-	int32 valCount = 0;
 	PIvaluetype type;
-	char tagName[MAX_TAGNAME_LEN];
 	std::vector<std::pair<int32, short> > vec;
 	std::shared_ptr<IServerInteractorOutput> output = m_pOutput.lock();
 	for (std::set<std::string>::const_iterator itr = tagNames.cbegin(); itr != tagNames.cend(); ++itr) {
@@ -279,26 +283,74 @@ void DrvOSIPIArchValues::PIServerInteractor::GetRecords(std::map<std::string, st
 		if (res == SUCCESS) {
 			res = pipt_pointtypex(pt, &type);
 			if (res == SUCCESS) {
-				/*valCount = 8000;
+				std::vector<Record> vecRecords;
+				if (m_pDataAttributes->m_iProcessed) {
+					getProcessedData(pt, m_pDataAttributes->m_pAggregateType.second, startPiTime, endPiTime, m_pDataAttributes->m_dProcessingInterval, vecRecords);
+				}
+				else {
+					getRawData(pt, type, &piStartTime, &piEndTime, vecRecords);
+				}
+				if (!vecRecords.empty()) {
+					tagsData.insert(std::make_pair<std::string, std::vector<Record> >(std::string(*itr),std::move(vecRecords)));
+				}
+				
+			}
+		}
+	}
+}
+
+void DrvOSIPIArchValues::PIServerInteractor::getRawData(int32 pt, PIvaluetype type, PITIMESTAMP* startTime, PITIMESTAMP* endTime, std::vector<Record>& vecRecords)
+{
+	double dVal = 0.0;
+	int32 iVal = 0;
+	int32 iStat = 0;
+	int16 iFlag = 0;
+	uint32 uSize = MAX_TAGNAME_LEN;
+	int32 valCount = LONG_MAX;
+	PITIMESTAMP piPtTime;
+	char stringData[MAX_TAGNAME_LEN];
+	memcpy(&piPtTime, endTime, sizeof(PITIMESTAMP));
+	int32 res = piar_getarcvaluesx(pt, ARCflag_comp, &valCount, &dVal, &iVal, stringData, &uSize, &iStat, &iFlag, startTime, &piPtTime, GETFIRST);
+	if (res == SUCCESS || res == -15010) {
+		vecRecords.push_back(mapRecordFromDataValue(type, dVal, iVal, stringData, uSize, piPtTime, iStat, iFlag));
+		while (res == SUCCESS || res == -15010) {
+			memcpy(&piPtTime, endTime, sizeof(PITIMESTAMP));
+			valCount = LONG_MAX;
+			res = piar_getarcvaluesx(pt, ARCflag_even, &valCount, &dVal, &iVal, stringData, &uSize, &iStat, &iFlag, startTime, &piPtTime, GETNEXT);
+			if (res == SUCCESS || res == -15010) {
+				vecRecords.push_back(mapRecordFromDataValue(type, dVal, iVal, stringData, uSize, piPtTime, iStat, iFlag));
+			}
+		}
+	}
+	/*valCount = 8000;
 				int32 times[8000];
 				times[0] = startPiTime;
 				times[7999] = endPiTime;
 				float rvals[8000];
 				int32 istats[8000];
-				res = piar_interpvalues(pt, &valCount, times, rvals, istats);
-				if (res == SUCCESS) {
-					for (int index = 0; index < 4000; ++index) {
-						res = istats[index];
-					}
-				}
 				res = piar_compvalues(pt, &valCount, times, rvals, istats,0);
 				if (res == SUCCESS) {
-					for (int index = 0; index < 4000; ++index) {
+					for (int index = 0; index < 8000; ++index) {
 						res = istats[index];
 					}
 				}*/
-			}
-		}
+}
+
+
+void DrvOSIPIArchValues::PIServerInteractor::getProcessedData(int32 pt, int32 code, int32 startTime, int32 endTime, double processedInterval, std::vector<Record>& vecRecords)
+{
+	float rVal;
+	float percent;
+	int32 start = startTime;
+	int32 end = endTime;
+	PITIMESTAMP piStartTime;
+	ZeroMemory(&piStartTime, sizeof(PITIMESTAMP));
+	int32 timeArray[6];
+	pitm_secint(startTime, timeArray);
+	int res = pitm_settime(&piStartTime, timeArray[2], timeArray[0], timeArray[1], timeArray[3], timeArray[4], timeArray[5]);
+	res = piar_summary(pt, &start, &end, &rVal, &percent, code);
+	if (res == SUCCESS) {
+		vecRecords.push_back(mapRecordFromDataValue(PI_Type_float32, rVal,0, NULL, 0, piStartTime, 0, 0));
 	}
 }
 
@@ -319,4 +371,88 @@ int32 DrvOSIPIArchValues::PiTimeFromSysTime(const SYSTEMTIME& sysTime)
 	arrayTime[5] = sysTime.wSecond;
 	pitm_intsec(&piTime, arrayTime);
 	return piTime;
+}
+
+int32 DrvOSIPIArchValues::PiTimeFromPiTimeStamp(const PITIMESTAMP& sysTime)
+{
+	int32 piTime;
+	int32 arrayTime[6];
+	arrayTime[0] = sysTime.month;
+	arrayTime[1] = sysTime.day;
+	arrayTime[2] = sysTime.year;
+	arrayTime[3] = sysTime.hour;
+	arrayTime[4] = sysTime.minute;
+	arrayTime[5] = sysTime.second;
+	pitm_intsec(&piTime, arrayTime);
+	return piTime;
+}
+
+
+DrvOSIPIArchValues::Record DrvOSIPIArchValues::mapRecordFromDataValue(PIvaluetype type, double dValue, int32 iVal, char* strVal, uint32 strSize,
+	const PITIMESTAMP& piTime, int32 iStat, int16 iFlag)
+{
+	Record record;
+	record.SetStatus(iFlag);
+	SYSTEMTIME serverDataTime = { 0 };
+	uint32 uInt;
+	serverDataTime.wYear = piTime.year;
+	serverDataTime.wMonth = piTime.month;
+	serverDataTime.wDay = piTime.day;
+	serverDataTime.wHour = piTime.hour;
+	serverDataTime.wMinute = piTime.minute;
+	serverDataTime.wSecond = piTime.second;
+	char* strPtr = reinterpret_cast<char*>(&serverDataTime);
+	record.insert(OSI_PI_SERVER_TIMESTAMP, PI_Type_PItimestamp, std::string(strPtr, sizeof(SYSTEMTIME)));
+	std::string valueStr;
+	switch (type)
+	{
+	case PI_Type_null:
+		valueStr.clear();
+		break;
+	case PI_Type_bool:
+		if (iVal > 0) {
+			valueStr = std::to_string(1);
+		}
+		else {
+			valueStr = std::to_string(0);
+		}
+		break;
+	case PI_Type_int8:
+	case PI_Type_int16:
+	case PI_Type_int32:
+		valueStr = std::to_string(iVal);
+		break;
+	case PI_Type_int64:
+		valueStr = std::to_string(iVal);
+		break;
+	case PI_Type_uint8:
+	case PI_Type_uint16:
+	case PI_Type_uint32:
+		uInt = iVal;
+		valueStr = std::to_string(uInt);
+		break;
+	case PI_Type_uint64:
+		uInt = iVal;
+		valueStr = std::to_string(uInt);
+		break;
+	case PI_Type_float64:
+		valueStr = std::to_string(dValue);
+		break;
+	case PI_Type_float32:
+	case PI_Type_float16:
+		valueStr = std::to_string(dValue);
+		break;
+	case PI_Type_PItimestamp:
+		
+		break;
+	case PI_Type_digital:
+		valueStr = std::to_string(iStat);
+		break;
+	default:
+		strVal[strSize - 1] = '\0';
+		valueStr = std::string(strVal);
+		break;
+	}
+	record.insert(OSI_PI_VALUE, (short)type, valueStr);
+	return record;
 }

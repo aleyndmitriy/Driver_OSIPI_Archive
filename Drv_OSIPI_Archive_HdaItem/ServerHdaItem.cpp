@@ -84,6 +84,6 @@ int DrvOSIPIArchValues::ServerHdaItem::Execute(ODS::HdaCommand* pCommand, ODS::H
 
 int DrvOSIPIArchValues::ServerHdaItem::DestroyResult(ODS::HdaCommandResult* pResult)
 {
-	delete pResult;
+	//delete pResult;
 	return ODS::ERR::OK;
 }

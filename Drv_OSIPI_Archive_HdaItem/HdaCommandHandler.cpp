@@ -594,6 +594,7 @@ ODS::Tvq* DrvOSIPIArchValues::HdaCommandHandler::CreateTvqFromRecord(const Recor
 			Log::GetInstance()->WriteInfoDebug(_T("Int32 result  %d !"), vValue.intVal);
 			break;
 		case PI_Type_int64:
+		case PI_Type_digital:
 			::VariantInit(&vValue);
 			vValue.vt = VT_I8;
 			vValue.llVal = std::stoll(itr->second.second);
