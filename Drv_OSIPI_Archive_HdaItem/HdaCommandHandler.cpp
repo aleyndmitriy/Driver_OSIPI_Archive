@@ -668,7 +668,12 @@ ODS::Tvq* DrvOSIPIArchValues::HdaCommandHandler::CreateTvqFromRecord(const Recor
 	if (localDataTime.wYear != 0) {
 		tvq->SetTimestamp(&localDataTime);
 	}
-	tvq->SetQuality(ODS::Tvq::QUALITY_GOOD);
+	if (record.GetStatus() == PI_M_QFLAG) {
+		tvq->SetQuality(ODS::Tvq::QUALITY_UNCERTAIN);
+	}
+	else if (record.GetStatus() == PI_M_SFLAG) {
+		tvq->SetQuality(ODS::Tvq::QUALITY_BAD);
+	}
 	return tvq;
 }
 

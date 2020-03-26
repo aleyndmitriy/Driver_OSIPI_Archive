@@ -4,7 +4,8 @@
 #include"Constants.h"
 
 
-DrvOSIPIArchValues::PIServerInteractor::PIServerInteractor(): m_pServerAttributes(), m_pDataAttributes(), m_pOutput()
+DrvOSIPIArchValues::PIServerInteractor::PIServerInteractor():
+	m_pServerAttributes(), m_pDataAttributes(), m_pOutput(), m_isGoodInclude(false), m_isAnnotatedInclude(false), m_isQuestionableInclude(false), m_isSubstitutedInclude(false)
 {
 
 }
@@ -24,6 +25,31 @@ void DrvOSIPIArchValues::PIServerInteractor::SetAttributes(std::shared_ptr<Conne
 void DrvOSIPIArchValues::PIServerInteractor::SetDataAttributes(std::shared_ptr<DataTypeAttributes> attributes)
 {
 	m_pDataAttributes = attributes;
+	if (m_pDataAttributes->m_vDataQuantities.empty()) {
+		m_isGoodInclude = true;
+	}
+	else {
+		for (std::vector<std::string>::const_iterator itr = m_pDataAttributes->m_vDataQuantities.cbegin(); itr != m_pDataAttributes->m_vDataQuantities.cend(); ++itr) {
+			try {
+				unsigned int mask = std::stoul(*itr);
+				if (mask == PI_M_SFLAG) {
+					m_isSubstitutedInclude = true;
+				}
+				else if (mask == PI_M_QFLAG) {
+					m_isQuestionableInclude = true;
+				}
+				else if (mask == PI_M_AFLAG){
+					m_isAnnotatedInclude = true;
+				}
+				else if (mask == 0) {
+					m_isGoodInclude = true;
+				}
+			}
+			catch (std::exception& e) {
+				m_isGoodInclude = true;
+			}
+		}
+	}
 }
 
 void DrvOSIPIArchValues::PIServerInteractor::SetOutput(std::shared_ptr<IServerInteractorOutput> output)
@@ -312,13 +338,17 @@ void DrvOSIPIArchValues::PIServerInteractor::getRawData(int32 pt, PIvaluetype ty
 	memcpy(&piPtTime, endTime, sizeof(PITIMESTAMP));
 	int32 res = piar_getarcvaluesx(pt, ARCflag_comp, &valCount, &dVal, &iVal, stringData, &uSize, &iStat, &iFlag, startTime, &piPtTime, GETFIRST);
 	if (res == SUCCESS || res == -15010) {
-		vecRecords.push_back(mapRecordFromDataValue(type, dVal, iVal, stringData, uSize, piPtTime, iStat, iFlag));
+		if ((iFlag == 0 && m_isGoodInclude) || (iFlag == PI_M_AFLAG && m_isAnnotatedInclude) || (iFlag == PI_M_QFLAG && m_isQuestionableInclude) || (iFlag == PI_M_SFLAG && m_isSubstitutedInclude)) {
+			vecRecords.push_back(mapRecordFromDataValue(type, dVal, iVal, stringData, uSize, piPtTime, iStat, iFlag));
+		}
 		while (res == SUCCESS || res == -15010) {
 			memcpy(&piPtTime, endTime, sizeof(PITIMESTAMP));
 			valCount = LONG_MAX;
 			res = piar_getarcvaluesx(pt, ARCflag_even, &valCount, &dVal, &iVal, stringData, &uSize, &iStat, &iFlag, startTime, &piPtTime, GETNEXT);
 			if (res == SUCCESS || res == -15010) {
-				vecRecords.push_back(mapRecordFromDataValue(type, dVal, iVal, stringData, uSize, piPtTime, iStat, iFlag));
+				if ((iFlag == 0 && m_isGoodInclude) || (iFlag == PI_M_AFLAG && m_isAnnotatedInclude) || (iFlag == PI_M_QFLAG && m_isQuestionableInclude) || (iFlag == PI_M_SFLAG && m_isSubstitutedInclude)) {
+					vecRecords.push_back(mapRecordFromDataValue(type, dVal, iVal, stringData, uSize, piPtTime, iStat, iFlag));
+				}
 			}
 		}
 	}

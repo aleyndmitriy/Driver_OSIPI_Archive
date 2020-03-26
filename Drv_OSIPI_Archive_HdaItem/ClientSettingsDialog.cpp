@@ -225,21 +225,14 @@ void CClientSettingsDialog::OnEnUpdateEditDataQuality()
 		int len = m_editDataQuality.GetWindowTextLengthA();
 		m_editDataQuality.GetWindowTextA(str);
 		char currentSymbol = str[selStart - 1];
-		bool isNoHex = !_istdigit(currentSymbol) && (currentSymbol != ',') && (currentSymbol != 'x') && (currentSymbol != 'a') && (currentSymbol != 'b') &&
-			(currentSymbol != 'c') && (currentSymbol != 'd') && (currentSymbol != 'e') && (currentSymbol != 'f');
-		if (isNoHex || ((selStart == 1) && (str[0] != '0')) || ((selStart == 2) && (str[1] != 'x')))
+		bool isFlag = currentSymbol != ',' && currentSymbol != '0' && currentSymbol != '1' && currentSymbol != '2' && currentSymbol != '4';
+		if (isFlag)
 		{
 			str.Delete(selStart - 1, 1);
 			m_editDataQuality.SetWindowTextA(str);
 			::SendMessage(m_editDataQuality.m_hWnd, EM_SETSEL, (WPARAM)(selStart - 1), (LPARAM)(selEnd - 1));
 		}
-		if (selStart >= 3) {
-			if ((currentSymbol == 'x' && str[selStart - 2] != '0') || ((currentSymbol == 'x' && str[selStart - 3] != ',')) || (currentSymbol != '0' && str[selStart - 2] == ',') || (currentSymbol != 'x' && str[selStart - 2] == '0') && str[selStart - 3] == ',') {
-				str.Delete(selStart - 1, 1);
-				m_editDataQuality.SetWindowTextA(str);
-				::SendMessage(m_editDataQuality.m_hWnd, EM_SETSEL, (WPARAM)(selStart - 1), (LPARAM)(selEnd - 1));
-			}
-		}
+		
 	}
 }
 

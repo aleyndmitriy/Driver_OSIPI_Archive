@@ -35,6 +35,10 @@ namespace DrvOSIPIArchValues
 		std::shared_ptr<ConnectionAttributes> m_pServerAttributes;
 		std::shared_ptr<DataTypeAttributes> m_pDataAttributes;
 		std::weak_ptr<IServerInteractorOutput> m_pOutput;
+		bool m_isGoodInclude;
+		bool m_isAnnotatedInclude;
+		bool m_isQuestionableInclude;
+		bool m_isSubstitutedInclude;
 		bool startApplication();
 		void openConnection(const std::string& message);
 		void getRawData(int32 pt, PIvaluetype type, PITIMESTAMP* startTime, PITIMESTAMP* endTime, std::vector<Record>& vecRecords);
